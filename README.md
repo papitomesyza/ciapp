@@ -45,11 +45,14 @@ npm start       # runs Express, serving dist/ + /api on port 3000
 | `APP_PASSPHRASE` | The single-user login passphrase. **Authoritative on every boot**: if it differs from the value last synced (tracked via an HMAC fingerprint, keyed with `SESSION_SECRET`, in the settings table), the login hash is updated to match. If you later change the passphrase from Settings, rebooting with the *same* `APP_PASSPHRASE` will not overwrite it — only an actual change to the env var does. Must not be unset or a placeholder (`change-me` / `change-me-year28`) when `NODE_ENV=production`. |
 | `SESSION_SECRET` | Secret used to sign session tokens and to fingerprint `APP_PASSPHRASE`. Set this to a long random string. Must not be unset or the dev default when `NODE_ENV=production`. |
 | `ANTHROPIC_API_KEY` | Enables AI text logging ("2 eggs, coffee with milk, banana"). Without it, the AI tab returns an error but the rest of the app works. |
+| `USDA_API_KEY` | Enables a USDA FoodData Central fallback for text search, used automatically when Open Food Facts' search is down or returns nothing. Free key: [fdc.nal.usda.gov/api-key-signup](https://fdc.nal.usda.gov/api-key-signup). Without it, search just runs OFF-only — nothing breaks. |
 | `PORT` | Defaults to `3000`. |
 | `DATA_DIR` | Where the SQLite file lives. Defaults to `/app/data` (matches the Zeabur volume mount). |
 | `NODE_ENV` | Set to `production` by the Dockerfile. When set, the server refuses to start if `SESSION_SECRET` or `APP_PASSPHRASE` are still unset or placeholder values — it exits with an error naming the offending variable instead of booting insecurely. |
 
 Login attempts are rate-limited to 10 per 15 minutes per IP; other `/api` routes are unaffected.
+
+Text search tries Open Food Facts first and falls back to USDA FoodData Central only if OFF errors or returns nothing — results are tagged so you can tell which one answered. Barcode scanning always uses OFF (USDA doesn't do barcode lookups) and AI logging is unaffected either way.
 
 ## Deploying to Zeabur
 

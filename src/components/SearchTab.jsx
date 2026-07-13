@@ -12,6 +12,10 @@ function offToFood(product) {
     defaultAmount: product.default_amount,
     basisMacros: product.per100g,
     macrosComplete: product.macros_complete !== false,
+    // `provider` is which upstream API a search result came from ('off' |
+    // 'usda') — distinct from `source` below, which is the log-provenance
+    // tag stored on the entry itself ('search'/'scan'/'ai'/...).
+    provider: product.source,
     source: 'search',
     raw: product,
   };
@@ -100,12 +104,14 @@ export default function SearchTab({ defaultMeal, onLogged }) {
     setSelected(null);
   }
 
-  // Search results can carry sparse nutriments. When that happens, re-fetch
-  // the full product by barcode (the working v2 endpoint) so what actually
+  // OFF results can carry sparse nutriments. When that happens, re-fetch the
+  // full product by barcode (the working OFF v2 endpoint) so what actually
   // gets logged is the authoritative macro snapshot, not a partial one.
+  // This re-fetch is OFF-specific — USDA results already carry full per-100g
+  // macros from the search response itself, so they're used directly.
   async function selectSearchResult(product) {
     const food = offToFood(product);
-    if (food.macrosComplete || !food.barcode) {
+    if (food.provider !== 'off' || food.macrosComplete || !food.barcode) {
       setSelected(food);
       return;
     }
@@ -185,7 +191,10 @@ export default function SearchTab({ defaultMeal, onLogged }) {
         return (
           <div className="result-row" key={`${product.barcode || product.name}-${i}`}>
             <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => selectSearchResult(product)}>
-              <div className="result-name">{product.name}</div>
+              <div className="result-name">
+                {product.name}
+                {product.source === 'usda' && <span className="provider-badge">USDA</span>}
+              </div>
               <div className="result-meta">
                 {product.brand ? `${product.brand} · ` : ''}
                 {Math.round(product.per100g.calories)} kcal / 100g

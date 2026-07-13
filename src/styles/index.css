@@ -459,6 +459,20 @@ a {
   margin-top: 2px;
 }
 
+.provider-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--text-dim);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  vertical-align: middle;
+}
+
 /* Loading / empty states */
 .empty-state {
   text-align: center;

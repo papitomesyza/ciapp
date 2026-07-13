@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { offProductToFood, hasCompleteBasisMacros, isOffProductFound } from '../lib/nutrition.js';
+import { searchUsda } from '../lib/usda.js';
 
 const router = Router();
 
@@ -20,10 +21,9 @@ function extractHits(data) {
   return null;
 }
 
-router.get('/search', async (req, res) => {
-  const query = String(req.query.q || '').trim();
-  if (!query) return res.json([]);
-
+// Never throws — any failure (network, non-2xx, malformed body, empty
+// results) resolves to an empty array so the route can fall back to USDA.
+async function searchOff(query) {
   const url = new URL(SEARCH_BASE_URL);
   url.searchParams.set('q', query);
   url.searchParams.set('page_size', '20');
@@ -32,24 +32,38 @@ router.get('/search', async (req, res) => {
 
   try {
     const response = await fetch(url, { headers: { 'User-Agent': OFF_USER_AGENT, Accept: 'application/json' } });
-    if (!response.ok) return res.status(502).json({ error: 'food search is unavailable right now' });
+    if (!response.ok) return [];
 
     const data = await response.json();
     const hits = extractHits(data);
-    if (hits === null) return res.status(502).json({ error: 'food search is unavailable right now' });
+    if (hits === null) return [];
 
-    const results = hits
+    return hits
       .filter((p) => p && p.product_name)
       .map((product) => ({
         ...offProductToFood(product),
+        source: 'off',
         macros_complete: hasCompleteBasisMacros(product.nutriments || {}),
       }))
       .filter((f) => f.per100g.calories > 0 || f.per100g.protein_g > 0 || f.per100g.carbs_g > 0 || f.per100g.fat_g > 0);
-
-    res.json(results);
-  } catch (err) {
-    res.status(502).json({ error: 'food search is unavailable right now' });
+  } catch {
+    return [];
   }
+}
+
+router.get('/search', async (req, res) => {
+  const query = String(req.query.q || '').trim();
+  if (!query) return res.json([]);
+
+  const offResults = await searchOff(query);
+  if (offResults.length > 0) return res.json(offResults);
+
+  // OFF errored or came back empty — fall back to USDA FoodData Central if
+  // it's configured. searchUsda() is a no-op (returns []) without a key.
+  const usdaResults = await searchUsda(query, process.env.USDA_API_KEY);
+  if (usdaResults.length > 0) return res.json(usdaResults);
+
+  res.status(502).json({ error: 'food search is unavailable right now' });
 });
 
 router.get('/barcode/:code', async (req, res) => {
