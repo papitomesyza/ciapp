@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import db from './db.js';
+import { SESSION_SECRET } from './env.js';
 
-const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-only-insecure-secret';
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 function sign(payload) {

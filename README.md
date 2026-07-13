@@ -42,18 +42,21 @@ npm start       # runs Express, serving dist/ + /api on port 3000
 
 | Variable | Purpose |
 |---|---|
-| `APP_PASSPHRASE` | The single-user login passphrase. Hashed into the database on first boot. Change it later from Settings. |
-| `SESSION_SECRET` | Secret used to sign session tokens. Set this to a long random string. |
+| `APP_PASSPHRASE` | The single-user login passphrase. **Authoritative on every boot**: if it differs from the value last synced (tracked via an HMAC fingerprint, keyed with `SESSION_SECRET`, in the settings table), the login hash is updated to match. If you later change the passphrase from Settings, rebooting with the *same* `APP_PASSPHRASE` will not overwrite it — only an actual change to the env var does. Must not be unset or a placeholder (`change-me` / `change-me-year28`) when `NODE_ENV=production`. |
+| `SESSION_SECRET` | Secret used to sign session tokens and to fingerprint `APP_PASSPHRASE`. Set this to a long random string. Must not be unset or the dev default when `NODE_ENV=production`. |
 | `ANTHROPIC_API_KEY` | Enables AI text logging ("2 eggs, coffee with milk, banana"). Without it, the AI tab returns an error but the rest of the app works. |
 | `PORT` | Defaults to `3000`. |
 | `DATA_DIR` | Where the SQLite file lives. Defaults to `/app/data` (matches the Zeabur volume mount). |
+| `NODE_ENV` | Set to `production` by the Dockerfile. When set, the server refuses to start if `SESSION_SECRET` or `APP_PASSPHRASE` are still unset or placeholder values — it exits with an error naming the offending variable instead of booting insecurely. |
+
+Login attempts are rate-limited to 10 per 15 minutes per IP; other `/api` routes are unaffected.
 
 ## Deploying to Zeabur
 
 1. Push this repo to GitHub.
 2. In Zeabur, create a new service from the repo using the **Docker** provider — it will build from the included `Dockerfile`.
 3. Attach a persistent volume mounted at `/app/data`.
-4. Set the environment variables above (`APP_PASSPHRASE`, `SESSION_SECRET`, `ANTHROPIC_API_KEY`).
+4. Set the environment variables above (`APP_PASSPHRASE`, `SESSION_SECRET`, `ANTHROPIC_API_KEY`) to real values — the container will exit on boot with a clear error if either `APP_PASSPHRASE` or `SESSION_SECRET` is missing or still a placeholder, since the image sets `NODE_ENV=production`.
 5. Deploy. The app boots fine against an empty volume — it creates the SQLite file and seeds default targets on first run.
 
 ## Data model notes

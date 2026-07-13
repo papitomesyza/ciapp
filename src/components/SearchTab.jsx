@@ -11,6 +11,7 @@ function offToFood(product) {
     unit: product.unit,
     defaultAmount: product.default_amount,
     basisMacros: product.per100g,
+    macrosComplete: product.macros_complete !== false,
     source: 'search',
     raw: product,
   };
@@ -47,6 +48,7 @@ export default function SearchTab({ defaultMeal, onLogged }) {
   const [favorites, setFavorites] = useState([]);
   const [customFoods, setCustomFoods] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [resolvingBarcode, setResolvingBarcode] = useState(null);
   const debounceRef = useRef(null);
 
   useEffect(() => {
@@ -96,6 +98,26 @@ export default function SearchTab({ defaultMeal, onLogged }) {
   async function handleConfirm(entry) {
     await onLogged(entry);
     setSelected(null);
+  }
+
+  // Search results can carry sparse nutriments. When that happens, re-fetch
+  // the full product by barcode (the working v2 endpoint) so what actually
+  // gets logged is the authoritative macro snapshot, not a partial one.
+  async function selectSearchResult(product) {
+    const food = offToFood(product);
+    if (food.macrosComplete || !food.barcode) {
+      setSelected(food);
+      return;
+    }
+    setResolvingBarcode(food.barcode);
+    try {
+      const full = await api.lookupBarcode(food.barcode);
+      setSelected(offToFood(full));
+    } catch {
+      setSelected(food);
+    } finally {
+      setResolvingBarcode(null);
+    }
   }
 
   return (
@@ -159,18 +181,23 @@ export default function SearchTab({ defaultMeal, onLogged }) {
       )}
       {results.map((product, i) => {
         const isFav = favorites.some((f) => f.name === product.name);
+        const resolving = resolvingBarcode && resolvingBarcode === product.barcode;
         return (
           <div className="result-row" key={`${product.barcode || product.name}-${i}`}>
-            <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => setSelected(offToFood(product))}>
+            <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => selectSearchResult(product)}>
               <div className="result-name">{product.name}</div>
               <div className="result-meta">
                 {product.brand ? `${product.brand} · ` : ''}
                 {Math.round(product.per100g.calories)} kcal / 100g
               </div>
             </div>
-            <button className={`icon-btn star-btn ${isFav ? 'active' : ''}`} onClick={() => toggleFavorite(offToFood(product))}>
-              <Star size={16} fill={isFav ? 'var(--accent)' : 'none'} />
-            </button>
+            {resolving ? (
+              <div className="spinner" style={{ width: 16, height: 16 }} />
+            ) : (
+              <button className={`icon-btn star-btn ${isFav ? 'active' : ''}`} onClick={() => toggleFavorite(offToFood(product))}>
+                <Star size={16} fill={isFav ? 'var(--accent)' : 'none'} />
+              </button>
+            )}
           </div>
         );
       })}

@@ -30,6 +30,24 @@ export function normalizeOffNutriments(nutriments = {}) {
   };
 }
 
+// True only when the basis macros we actually rely on (calories, protein,
+// carbs, fat) are present in the raw nutriments payload — not merely
+// defaulted to 0 by normalizeOffNutriments. Used to decide whether a search
+// result needs an authoritative re-fetch by barcode before logging.
+export function hasCompleteBasisMacros(nutriments = {}) {
+  const present = (key) => nutriments[key] !== undefined && nutriments[key] !== null;
+  const hasEnergy = present('energy-kcal_100g') || present('energy-kcal');
+  return hasEnergy && present('proteins_100g') && present('carbohydrates_100g') && present('fat_100g');
+}
+
+// OFF returns HTTP 200 for a barcode miss and can report status 1 with an
+// empty product object — a product only counts as "found" when it actually
+// carries a nutriments object.
+export function isOffProductFound(data) {
+  return !!data && data.status === 1 && !!data.product && typeof data.product === 'object'
+    && !!data.product.nutriments && typeof data.product.nutriments === 'object';
+}
+
 export function offProductToFood(product) {
   const per100g = normalizeOffNutriments(product.nutriments || {});
   const servingQuantity = Number(product.serving_quantity);

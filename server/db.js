@@ -1,7 +1,9 @@
 import Database from 'better-sqlite3';
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
+import { SESSION_SECRET, APP_PASSPHRASE, DEV_PASSPHRASE } from './env.js';
 
 const DATA_DIR = process.env.DATA_DIR || '/app/data';
 const DB_PATH = path.join(DATA_DIR, 'year28-macros.db');
@@ -85,15 +87,39 @@ db.exec(`
   );
 `);
 
-// Seed settings row on first boot.
-const existing = db.prepare('SELECT id FROM settings WHERE id = 1').get();
+// Idempotent migration: add env_passphrase_fingerprint if an older DB doesn't have it yet.
+const settingsColumns = db.prepare('PRAGMA table_info(settings)').all();
+if (!settingsColumns.some((c) => c.name === 'env_passphrase_fingerprint')) {
+  db.exec('ALTER TABLE settings ADD COLUMN env_passphrase_fingerprint TEXT');
+}
+
+function fingerprintPassphrase(passphrase) {
+  return crypto.createHmac('sha256', SESSION_SECRET).update(passphrase).digest('hex');
+}
+
+// Seed on first boot, or reconcile the login hash against APP_PASSPHRASE on every boot after.
+const existing = db.prepare('SELECT passphrase_hash, env_passphrase_fingerprint FROM settings WHERE id = 1').get();
+
 if (!existing) {
-  const seedPassphrase = process.env.APP_PASSPHRASE || 'change-me-year28';
+  const seedPassphrase = APP_PASSPHRASE || DEV_PASSPHRASE;
   const hash = bcrypt.hashSync(seedPassphrase, 10);
+  const fingerprint = APP_PASSPHRASE ? fingerprintPassphrase(APP_PASSPHRASE) : null;
   db.prepare(`
-    INSERT INTO settings (id, passphrase_hash)
-    VALUES (1, ?)
-  `).run(hash);
+    INSERT INTO settings (id, passphrase_hash, env_passphrase_fingerprint)
+    VALUES (1, ?, ?)
+  `).run(hash, fingerprint);
+} else if (APP_PASSPHRASE) {
+  // Only touch the login hash when APP_PASSPHRASE has actually changed since we
+  // last synced it — otherwise a passphrase set later via Settings would get
+  // silently clobbered on every subsequent reboot.
+  const currentFingerprint = fingerprintPassphrase(APP_PASSPHRASE);
+  if (currentFingerprint !== existing.env_passphrase_fingerprint) {
+    const hash = bcrypt.hashSync(APP_PASSPHRASE, 10);
+    db.prepare(`
+      UPDATE settings SET passphrase_hash = ?, env_passphrase_fingerprint = ?, updated_at = datetime('now')
+      WHERE id = 1
+    `).run(hash, currentFingerprint);
+  }
 }
 
 export default db;

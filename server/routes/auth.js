@@ -1,9 +1,18 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { checkPassphrase, issueToken, setPassphrase, requireAuth } from '../auth.js';
 
 const router = Router();
 
-router.post('/login', (req, res) => {
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too many login attempts — try again later' },
+});
+
+router.post('/login', loginLimiter, (req, res) => {
   const { passphrase } = req.body || {};
   if (!passphrase || !checkPassphrase(passphrase)) {
     return res.status(401).json({ error: 'incorrect passphrase' });
