@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '../api.js';
 import { weekLabel, monthLabel, nextRangeAnchor, prevRangeAnchor } from '../history.js';
 import BalanceCard from '../components/BalanceCard.jsx';
+import BalanceCarousel from '../components/BalanceCarousel.jsx';
 import WeekView from '../components/WeekView.jsx';
 import MonthView from '../components/MonthView.jsx';
 import YearView from '../components/YearView.jsx';
@@ -97,11 +98,13 @@ export default function History() {
         </div>
       </div>
 
-      <div className="balance-cards">
-        <BalanceCard title="This Week" loading={!currentWeek || !targets} loggedDays={currentWeek?.loggedDays} averages={currentWeek?.averages} targets={targets} />
-        <BalanceCard title="This Month" loading={!currentMonth || !targets} loggedDays={currentMonth?.loggedDays} averages={currentMonth?.averages} targets={targets} />
-        <BalanceCard title="This Year" loading={!currentYear || !targets} loggedDays={currentYear?.loggedDays} averages={currentYear?.averages} targets={targets} />
-      </div>
+      <BalanceCarousel
+        cards={[
+          <BalanceCard title="This Week" loading={!currentWeek || !targets} loggedDays={currentWeek?.loggedDays} averages={currentWeek?.averages} targets={targets} />,
+          <BalanceCard title="This Month" loading={!currentMonth || !targets} loggedDays={currentMonth?.loggedDays} averages={currentMonth?.averages} targets={targets} />,
+          <BalanceCard title="This Year" loading={!currentYear || !targets} loggedDays={currentYear?.loggedDays} averages={currentYear?.averages} targets={targets} />,
+        ]}
+      />
 
       <div className="segmented">
         {SCOPES.map((s) => (

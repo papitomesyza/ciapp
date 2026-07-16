@@ -7,32 +7,40 @@ export default function BalanceCard({ title, loading, loggedDays, averages, targ
 
   return (
     <div className="glass-card balance-card">
-      <div className="balance-card-title">{title}</div>
+      <div className="balance-card-head">
+        <div className="balance-card-title">{title}</div>
+        {ready && (
+          <div className="balance-logged-days">{loggedDays} logged day{loggedDays === 1 ? '' : 's'}</div>
+        )}
+      </div>
 
       {!ready ? (
-        <div className="spinner" style={{ margin: '10px auto' }} />
+        <div className="spinner" style={{ margin: '18px auto' }} />
       ) : (
-        <>
+        <div className="balance-metrics">
           <div className="balance-metric">
             <div className="balance-metric-label">Calories</div>
             <div className="balance-metric-status" style={{ color: STATUS_COLOR[cal.status] }}>
               {STATUS_LABEL[cal.status]}
             </div>
-            {cal.status !== 'unknown' && (
-              <div className="balance-metric-delta">{cal.delta >= 0 ? '+' : ''}{cal.delta}/day</div>
-            )}
+            <div className="balance-metric-detail">
+              {cal.status === 'unknown'
+                ? '—'
+                : `${Math.round(averages.calories)} kcal/day · ${cal.delta >= 0 ? '+' : ''}${cal.delta}`}
+            </div>
           </div>
           <div className="balance-metric">
             <div className="balance-metric-label">Protein</div>
             <div className="balance-metric-status" style={{ color: STATUS_COLOR[pro.status] }}>
               {STATUS_LABEL[pro.status]}
             </div>
-            {pro.status !== 'unknown' && (
-              <div className="balance-metric-delta">{pro.delta >= 0 ? '+' : ''}{pro.delta}g/day</div>
-            )}
+            <div className="balance-metric-detail">
+              {pro.status === 'unknown'
+                ? '—'
+                : `${Math.round(averages.protein_g)} g/day · ${pro.delta >= 0 ? '+' : ''}${pro.delta}`}
+            </div>
           </div>
-          <div className="balance-logged-days">{loggedDays} logged day{loggedDays === 1 ? '' : 's'}</div>
-        </>
+        </div>
       )}
     </div>
   );
