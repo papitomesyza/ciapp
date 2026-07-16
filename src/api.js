@@ -69,6 +69,13 @@ export const api = {
 
   getDaySummary: (date) => request(`/summary/day?date=${date}`),
   getWeekSummary: (from, to) => request(`/summary/week?from=${from}&to=${to}`),
+
+  // scope: 'week' | 'month' | 'year'; date is an optional YYYY-MM-DD anchor —
+  // omit it to get the current period (computed server-side, Pristina time).
+  getHistoryRange: (scope, date) => {
+    const qs = new URLSearchParams({ scope, ...(date ? { date } : {}) }).toString();
+    return request(`/history/range?${qs}`);
+  },
 };
 
 export { ApiError };

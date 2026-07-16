@@ -1,7 +1,7 @@
 import { Pencil, Trash2 } from 'lucide-react';
 
-const MEAL_ORDER = ['breakfast', 'lunch', 'dinner', 'snack'];
-const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' };
+export const MEAL_ORDER = ['breakfast', 'lunch', 'dinner', 'snack'];
+export const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' };
 
 export default function EntryList({ entries, onEdit, onDelete }) {
   if (!entries.length) {

@@ -1,138 +1,149 @@
-import { useEffect, useState } from 'react';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { useEffect, useState, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '../api.js';
-import { formatDateLabel, formatWeekdayShort, todayISO } from '../nutrition.js';
-import EntryList from '../components/EntryList.jsx';
-import EditEntryModal from '../components/EditEntryModal.jsx';
+import { weekLabel, monthLabel, nextRangeAnchor, prevRangeAnchor } from '../history.js';
+import BalanceCard from '../components/BalanceCard.jsx';
+import WeekView from '../components/WeekView.jsx';
+import MonthView from '../components/MonthView.jsx';
+import YearView from '../components/YearView.jsx';
+import DayDetailModal from '../components/DayDetailModal.jsx';
 
-function daysAgoISO(n) {
-  const d = new Date();
-  d.setDate(d.getDate() - n);
-  const tzOffset = d.getTimezoneOffset() * 60000;
-  return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
-}
-
-function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload || !payload.length) return null;
-  return (
-    <div className="chart-tooltip">
-      <div style={{ fontWeight: 700, marginBottom: 4 }}>{formatDateLabel(label)}</div>
-      {payload.map((p) => (
-        <div key={p.dataKey}>
-          {p.name}: {Math.round(p.value)}
-        </div>
-      ))}
-    </div>
-  );
-}
+const SCOPES = [
+  { id: 'week', label: 'Week' },
+  { id: 'month', label: 'Month' },
+  { id: 'year', label: 'Year' },
+];
 
 export default function History() {
-  const [week, setWeek] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [dayEntries, setDayEntries] = useState([]);
-  const [editing, setEditing] = useState(null);
+  const [targets, setTargets] = useState(null);
+
+  // Top-of-page balance cards always reflect the current week/month/year,
+  // independent of whatever the browser below is paged to.
+  const [currentWeek, setCurrentWeek] = useState(null);
+  const [currentMonth, setCurrentMonth] = useState(null);
+  const [currentYear, setCurrentYear] = useState(null);
+
+  const [scope, setScope] = useState('week');
+  const [anchor, setAnchor] = useState(null); // null = current period
+  const [range, setRange] = useState(null);
+  const [rangeLoading, setRangeLoading] = useState(true);
+  const [openDate, setOpenDate] = useState(null);
 
   useEffect(() => {
-    const from = daysAgoISO(6);
-    const to = todayISO();
-    api.getWeekSummary(from, to).then((data) => {
-      setWeek(data.days);
-      setLoading(false);
-    });
+    api.getTargets().then(setTargets);
+    api.getHistoryRange('week').then(setCurrentWeek);
+    api.getHistoryRange('month').then(setCurrentMonth);
+    api.getHistoryRange('year').then(setCurrentYear);
   }, []);
 
-  async function selectDay(date) {
-    if (selectedDate === date) {
-      setSelectedDate(null);
-      return;
-    }
-    setSelectedDate(date);
-    const entries = await api.getEntries({ date });
-    setDayEntries(entries);
+  const loadRange = useCallback(async () => {
+    setRangeLoading(true);
+    const data = await api.getHistoryRange(scope, anchor || undefined);
+    setRange(data);
+    setRangeLoading(false);
+  }, [scope, anchor]);
+
+  useEffect(() => {
+    loadRange();
+  }, [loadRange]);
+
+  function switchScope(nextScope) {
+    setScope(nextScope);
+    setAnchor(null);
   }
 
-  async function handleDelete(entry) {
-    if (!window.confirm(`Remove ${entry.food_name}?`)) return;
-    await api.deleteEntry(entry.id);
-    const entries = await api.getEntries({ date: selectedDate });
-    setDayEntries(entries);
+  function goPrev() {
+    if (!range) return;
+    setAnchor(prevRangeAnchor(range));
   }
 
-  async function handleSaveEdit(form) {
-    await api.updateEntry(form.id, form);
-    setEditing(null);
-    const entries = await api.getEntries({ date: selectedDate });
-    setDayEntries(entries);
+  function goNext() {
+    if (!range) return;
+    setAnchor(nextRangeAnchor(range));
   }
 
-  const chartData = week.map((d) => ({
-    date: d.date,
-    Calories: d.totals.calories,
-    Protein: d.totals.protein_g,
-  }));
+  function goToday() {
+    setAnchor(null);
+  }
+
+  function jumpToMonth(monthStart) {
+    setScope('month');
+    setAnchor(monthStart);
+  }
+
+  function handleDayChanged() {
+    // An edit/delete inside the day detail sheet can change aggregates —
+    // refresh both the browse range and the always-current top cards.
+    loadRange();
+    api.getHistoryRange('week').then(setCurrentWeek);
+    api.getHistoryRange('month').then(setCurrentMonth);
+    api.getHistoryRange('year').then(setCurrentYear);
+  }
+
+  const rangeLabel = range && range.scope === scope
+    ? scope === 'week'
+      ? weekLabel(range.start, range.end)
+      : scope === 'month'
+        ? monthLabel(range.start)
+        : String(range.year)
+    : '';
 
   return (
     <div className="page">
       <div className="page-header">
         <div>
           <h1>History</h1>
-          <div className="subtitle">Last 7 days</div>
+          <div className="subtitle">Your balance over time</div>
         </div>
       </div>
 
-      {loading ? (
+      <div className="balance-cards">
+        <BalanceCard title="This Week" loading={!currentWeek || !targets} loggedDays={currentWeek?.loggedDays} averages={currentWeek?.averages} targets={targets} />
+        <BalanceCard title="This Month" loading={!currentMonth || !targets} loggedDays={currentMonth?.loggedDays} averages={currentMonth?.averages} targets={targets} />
+        <BalanceCard title="This Year" loading={!currentYear || !targets} loggedDays={currentYear?.loggedDays} averages={currentYear?.averages} targets={targets} />
+      </div>
+
+      <div className="segmented">
+        {SCOPES.map((s) => (
+          <button key={s.id} className={scope === s.id ? 'active' : ''} onClick={() => switchScope(s.id)}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="range-header">
+        <div className="range-header-label">{rangeLabel}</div>
+        <div className="range-nav">
+          <button onClick={goPrev} disabled={!range} aria-label="Previous">
+            <ChevronLeft size={18} />
+          </button>
+          {anchor && (
+            <button onClick={goToday} aria-label="Jump to current">
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '0 4px' }}>Now</span>
+            </button>
+          )}
+          <button onClick={goNext} disabled={!range} aria-label="Next">
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      </div>
+
+      {rangeLoading || !range || !targets || range.scope !== scope ? (
         <div className="empty-state">
           <div className="spinner" style={{ margin: '0 auto 10px' }} />
           Loading…
         </div>
       ) : (
         <>
-          <div className="glass-card">
-            <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 8, fontWeight: 700 }}>CALORIES</div>
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={chartData}>
-                <CartesianGrid stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={formatWeekdayShort} tick={{ fill: 'var(--text-dim)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis hide />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--surface-strong)' }} />
-                <Bar dataKey="Calories" fill="var(--accent)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="glass-card">
-            <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 8, fontWeight: 700 }}>PROTEIN (G)</div>
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={chartData}>
-                <CartesianGrid stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={formatWeekdayShort} tick={{ fill: 'var(--text-dim)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis hide />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--surface-strong)' }} />
-                <Bar dataKey="Protein" fill="#4da3ff" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="glass-card">
-            {[...week].reverse().map((d) => (
-              <div key={d.date}>
-                <div className="history-day-row" onClick={() => selectDay(d.date)}>
-                  <span>{formatDateLabel(d.date)}</span>
-                  <span>{Math.round(d.totals.calories)} kcal</span>
-                </div>
-                {selectedDate === d.date && (
-                  <div style={{ padding: '4px 0 12px' }}>
-                    <EntryList entries={dayEntries} onEdit={setEditing} onDelete={handleDelete} />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          {scope === 'week' && <WeekView range={range} onDateClick={setOpenDate} />}
+          {scope === 'month' && <MonthView range={range} targets={targets} onDateClick={setOpenDate} />}
+          {scope === 'year' && <YearView range={range} targets={targets} onMonthClick={jumpToMonth} />}
         </>
       )}
 
-      {editing && <EditEntryModal entry={editing} onClose={() => setEditing(null)} onSave={handleSaveEdit} />}
+      {openDate && targets && (
+        <DayDetailModal date={openDate} targets={targets} onClose={() => setOpenDate(null)} onChanged={handleDayChanged} />
+      )}
     </div>
   );
 }

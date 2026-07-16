@@ -583,3 +583,204 @@ a {
   height: 100%;
   object-fit: cover;
 }
+
+/* History — balance cards */
+.balance-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.balance-card {
+  padding: 12px 10px;
+}
+
+.balance-card-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
+}
+
+.balance-metric {
+  margin-bottom: 8px;
+}
+
+.balance-metric-label {
+  font-size: 10px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.balance-metric-status {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.balance-metric-delta {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.balance-logged-days {
+  font-size: 10px;
+  color: var(--text-faint);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* History — range paging header */
+.range-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 10px;
+}
+
+.range-header-label {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.range-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.range-nav button {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--text-dim);
+}
+
+.range-nav button:active {
+  background: var(--surface-strong);
+}
+
+.range-nav button:disabled {
+  opacity: 0.3;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+}
+
+.copy-btn:active {
+  color: var(--accent);
+}
+
+/* History — calendar grid */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-faint);
+  font-weight: 700;
+  padding-bottom: 4px;
+}
+
+.calendar-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--text-dim);
+  position: relative;
+}
+
+.calendar-cell.in-range:active {
+  background: var(--surface-strong);
+}
+
+.calendar-cell.out-of-range {
+  color: var(--text-faint);
+  opacity: 0.35;
+}
+
+.calendar-cell.today {
+  border: 1px solid var(--accent);
+}
+
+.calendar-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 3px;
+}
+
+/* History — month/year row lists */
+.month-row,
+.year-month-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+
+.month-row:last-child,
+.year-month-row:last-child {
+  border-bottom: none;
+}
+
+.year-month-row:active {
+  opacity: 0.7;
+}
+
+.year-month-name {
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.year-month-stats {
+  text-align: right;
+}
+
+.year-month-status {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.year-month-meta {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* History — day detail sheet */
+.day-detail-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
