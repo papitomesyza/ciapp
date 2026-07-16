@@ -5,7 +5,8 @@ export default function ProgressBar({ label, value, target, unit, color }) {
       <div className="bar-labels">
         <span>{label}</span>
         <span>
-          {Math.round(value)} / {Math.round(target)} {unit}
+          <span className="bar-value">{Math.round(value)}</span>
+          <span className="bar-target"> / {Math.round(target)} {unit}</span>
         </span>
       </div>
       <div className="bar-track">

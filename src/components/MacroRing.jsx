@@ -30,15 +30,16 @@ export default function MacroRing({ label, value, target, unit, color = 'var(--a
         />
         <text
           x="50%"
-          y="47%"
+          y="48%"
           textAnchor="middle"
-          fontSize="15"
-          fontWeight="800"
+          fontSize="18"
+          fontWeight="700"
+          letterSpacing="-0.3"
           fill="var(--text)"
         >
           {Math.round(value)}
         </text>
-        <text x="50%" y="63%" textAnchor="middle" fontSize="9" fill="var(--text-dim)">
+        <text x="50%" y="64%" textAnchor="middle" fontSize="9" fontWeight="500" fill="var(--text-dim)">
           /{Math.round(target)}{unit}
         </text>
       </svg>

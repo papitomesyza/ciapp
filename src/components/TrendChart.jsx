@@ -46,7 +46,7 @@ export default function TrendChart({ days, compactTicks = false }) {
             <XAxis dataKey="date" tickFormatter={tickFormatter} tick={{ fill: 'var(--text-dim)', fontSize: 10 }} axisLine={false} tickLine={false} interval={compactTicks ? 4 : 0} />
             <YAxis hide />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--surface-strong)' }} />
-            <Bar dataKey="Protein" fill="#4da3ff" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="Protein" fill="var(--protein)" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

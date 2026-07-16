@@ -1,20 +1,26 @@
 :root {
+  /* Apple Health dark-mode surfaces: near-black canvas, solid elevated
+     cards (#1C1C1E / #2C2C2E), hairline separators, HIG label opacities. */
   --bg: #0c0c0c;
   --accent: #00d341;
   --accent-dim: #00d34133;
-  --surface: rgba(255, 255, 255, 0.045);
-  --surface-strong: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.09);
-  --text: #f2f2f2;
-  --text-dim: #9a9a9a;
-  --text-faint: #666;
-  --danger: #ff5c5c;
-  --sugar: #ffb020;
-  --sodium: #4da3ff;
-  --satfat: #ff7a7a;
+  --surface: #1c1c1e;
+  --surface-strong: #2c2c2e;
+  --border: rgba(84, 84, 88, 0.5);
+  --text: #ffffff;
+  --text-dim: rgba(235, 235, 245, 0.6);
+  --text-faint: rgba(235, 235, 245, 0.3);
+  --danger: #ff453a;
+  /* Per-nutrient colors from Apple's dark-mode system palette */
+  --protein: #64d2ff;
+  --carbs: #ff9f0a;
+  --fat: #ff375f;
+  --sugar: #ff9f0a;
+  --sodium: #0a84ff;
+  --satfat: #ff375f;
   --fiber: #00d341;
-  --radius-lg: 20px;
-  --radius-md: 14px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
   --radius-sm: 10px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -78,28 +84,47 @@ a {
   margin-bottom: 18px;
 }
 
+/* iOS large-title header with a small-caps date eyebrow above it */
+.page-eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
 .page-header h1 {
-  font-size: 22px;
+  font-size: 34px;
   font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
 .page-header .subtitle {
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 15px;
+  margin-top: 2px;
 }
 
 .glass-card {
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   padding: 16px;
 }
 
 .glass-card + .glass-card {
   margin-top: 12px;
+}
+
+/* Health-style card header: small icon + colored label, chevron-ready */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 14px;
 }
 
 /* Bottom nav */
@@ -113,11 +138,11 @@ a {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 8px 8px calc(10px + var(--safe-bottom));
-  background: rgba(12, 12, 12, 0.85);
-  border-top: 1px solid var(--border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  padding: 6px 8px calc(8px + var(--safe-bottom));
+  background: rgba(18, 18, 20, 0.82);
+  border-top: 0.5px solid var(--border);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
   z-index: 40;
 }
 
@@ -129,8 +154,8 @@ a {
   padding: 6px 14px;
   border-radius: var(--radius-sm);
   color: var(--text-faint);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 500;
   transition: color 0.15s ease;
 }
 
@@ -189,14 +214,27 @@ a {
 .bar-row {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px 0;
+  gap: 6px;
+  padding: 9px 0;
 }
 
 .bar-row .bar-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  align-items: baseline;
+  font-size: 15px;
+  color: var(--text);
+}
+
+/* Health-style value: bold current figure, quiet target suffix */
+.bar-value {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.bar-target {
+  font-weight: 400;
+  font-size: 13px;
   color: var(--text-dim);
 }
 
@@ -290,16 +328,20 @@ a {
   color: var(--danger);
 }
 
-/* Buttons */
+/* Buttons — iOS filled style: 17pt semibold, continuous 12pt corners */
 .btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 13px 18px;
+  padding: 14px 18px;
   border-radius: var(--radius-md);
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.btn:active {
+  opacity: 0.75;
 }
 
 .btn-primary {
@@ -312,8 +354,7 @@ a {
 }
 
 .btn-ghost {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface-strong);
   color: var(--text);
 }
 
@@ -334,7 +375,7 @@ a {
 }
 
 .field label {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-dim);
   font-weight: 600;
 }
@@ -343,11 +384,13 @@ a {
 .field select,
 .field textarea {
   background: var(--surface-strong);
-  border: 1px solid var(--border);
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   padding: 12px 14px;
-  font-size: 15px;
+  font-size: 17px;
   outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .field input:focus,
@@ -365,27 +408,30 @@ a {
   flex: 1;
 }
 
-/* Segmented / tabs */
+/* Segmented / tabs — UISegmentedControl (dark): translucent gray track,
+   elevated gray thumb with a soft shadow, white text on the selection */
 .segmented {
   display: flex;
-  background: var(--surface-strong);
-  border-radius: var(--radius-sm);
-  padding: 4px;
-  gap: 4px;
+  background: rgba(118, 118, 128, 0.24);
+  border-radius: 9px;
+  padding: 2px;
+  gap: 2px;
 }
 
 .segmented button {
   flex: 1;
-  padding: 9px;
-  border-radius: 8px;
+  padding: 8px;
+  border-radius: 7px;
   font-size: 13px;
-  font-weight: 700;
-  color: var(--text-dim);
+  font-weight: 600;
+  color: var(--text);
+  transition: background 0.15s ease;
 }
 
 .segmented button.active {
-  background: var(--accent);
-  color: #05130a;
+  background: #636366;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 1px 1px rgba(0, 0, 0, 0.15);
 }
 
 /* Sheet / modal */
@@ -403,25 +449,36 @@ a {
   width: 100%;
   max-width: 560px;
   max-height: 90vh;
-  background: #121212;
-  border: 1px solid var(--border);
-  border-bottom: none;
-  border-radius: 22px 22px 0 0;
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   padding-bottom: var(--safe-bottom);
 }
 
+/* iOS sheet grabber */
+.sheet::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.22);
+  margin: 8px auto 0;
+  flex-shrink: 0;
+}
+
 .sheet-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 16px 8px;
+  padding: 10px 16px 8px;
 }
 
 .sheet-header h2 {
   font-size: 17px;
+  font-weight: 600;
   margin: 0;
 }
 
@@ -431,6 +488,17 @@ a {
   flex: 1;
 }
 
+/* One elevation tier up for surfaces nested inside a sheet */
+.sheet .glass-card {
+  background: var(--surface-strong);
+}
+
+.sheet .glass-card .field input,
+.sheet .glass-card .field select,
+.sheet .glass-card .field textarea {
+  background: #3a3a3c;
+}
+
 /* Search result rows */
 .result-row {
   display: flex;
@@ -438,14 +506,13 @@ a {
   justify-content: space-between;
   gap: 10px;
   padding: 12px;
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-strong);
   margin-bottom: 8px;
 }
 
 .result-row:active {
-  background: var(--surface-strong);
+  opacity: 0.7;
 }
 
 .result-name {
@@ -508,8 +575,9 @@ a {
 }
 
 .login-logo {
-  font-size: 26px;
-  font-weight: 800;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .login-logo span {
@@ -530,11 +598,11 @@ a {
 
 /* Chart tooltip */
 .chart-tooltip {
-  background: #1a1a1a;
-  border: 1px solid var(--border);
+  background: #2c2c2e;
   border-radius: 10px;
   padding: 8px 12px;
   font-size: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .history-day-row {
@@ -725,8 +793,17 @@ a {
   opacity: 0.35;
 }
 
-.calendar-cell.today {
-  border: 1px solid var(--accent);
+/* Today = filled tint circle behind the day number, like the iOS calendar */
+.calendar-cell.today span {
+  background: var(--accent);
+  color: #05130a;
+  font-weight: 700;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .calendar-dot {

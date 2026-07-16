@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Flame, Gauge } from 'lucide-react';
 import { api } from '../api.js';
 import { sumMacros, todayISO } from '../nutrition.js';
 import MacroRing from '../components/MacroRing.jsx';
@@ -69,23 +69,31 @@ export default function Today() {
     <div className="page">
       <div className="page-header">
         <div>
-          <h1>Today</h1>
-          <div className="subtitle">
+          <div className="page-eyebrow">
             {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
           </div>
+          <h1>Today</h1>
         </div>
       </div>
 
       <div className="glass-card">
+        <div className="card-header" style={{ color: 'var(--accent)' }}>
+          <Flame size={16} />
+          Macros
+        </div>
         <div className="rings-grid">
           <MacroRing label="Calories" value={totals.calories} target={targets.calories_target} unit="" color="var(--accent)" />
-          <MacroRing label="Protein" value={totals.protein_g} target={targets.protein_g_target} unit="g" color="#4da3ff" />
-          <MacroRing label="Carbs" value={totals.carbs_g} target={targets.carbs_g_target} unit="g" color="#ffb020" />
-          <MacroRing label="Fat" value={totals.fat_g} target={targets.fat_g_target} unit="g" color="#ff7a7a" />
+          <MacroRing label="Protein" value={totals.protein_g} target={targets.protein_g_target} unit="g" color="var(--protein)" />
+          <MacroRing label="Carbs" value={totals.carbs_g} target={targets.carbs_g_target} unit="g" color="var(--carbs)" />
+          <MacroRing label="Fat" value={totals.fat_g} target={targets.fat_g_target} unit="g" color="var(--fat)" />
         </div>
       </div>
 
       <div className="glass-card">
+        <div className="card-header" style={{ color: 'var(--sodium)' }}>
+          <Gauge size={16} />
+          Nutrients
+        </div>
         <ProgressBar label="Fiber" value={totals.fiber_g} target={targets.fiber_g_target} unit="g" color="var(--fiber)" />
         <ProgressBar label="Sugar" value={totals.sugar_g} target={targets.sugar_g_target} unit="g" color="var(--sugar)" />
         <ProgressBar label="Sodium" value={totals.sodium_mg} target={targets.sodium_mg_target} unit="mg" color="var(--sodium)" />
