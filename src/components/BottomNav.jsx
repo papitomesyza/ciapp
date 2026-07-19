@@ -1,8 +1,9 @@
-import { Home, NotebookPen, History, Settings } from 'lucide-react';
+import { Home, NotebookPen, History, ListChecks, Settings } from 'lucide-react';
 
 const TABS = [
   { id: 'today', label: 'Today', icon: Home },
   { id: 'log', label: 'Log', icon: NotebookPen },
+  { id: 'habits', label: 'Habits', icon: ListChecks },
   { id: 'history', label: 'History', icon: History },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];

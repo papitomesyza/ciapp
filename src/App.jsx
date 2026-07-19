@@ -6,6 +6,7 @@ import BottomNav from './components/BottomNav.jsx';
 import LogSheet from './components/LogSheet.jsx';
 import Today from './pages/Today.jsx';
 import History from './pages/History.jsx';
+import Habits from './pages/Habits.jsx';
 import Settings from './pages/Settings.jsx';
 
 export default function App() {
@@ -48,6 +49,7 @@ export default function App() {
     <div className="app-shell">
       {page === 'today' && <Today key={refreshKey} />}
       {page === 'history' && <History key={refreshKey} />}
+      {page === 'habits' && <Habits />}
       {page === 'settings' && <Settings onLoggedOut={handleLoggedOut} />}
 
       <BottomNav active={showLogSheet ? 'log' : page} onSelect={handleNavSelect} />

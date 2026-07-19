@@ -15,6 +15,7 @@ import foodsRoutes from './routes/foods.js';
 import aiRoutes from './routes/ai.js';
 import summaryRoutes from './routes/summary.js';
 import historyRoutes from './routes/history.js';
+import habitsRoutes from './routes/habits.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -36,6 +37,7 @@ app.use('/api/favorites', requireAuth, favoritesRoutes);
 app.use('/api/custom-foods', requireAuth, customFoodsRoutes);
 app.use('/api/summary', requireAuth, summaryRoutes);
 app.use('/api/history', requireAuth, historyRoutes);
+app.use('/api/habits', requireAuth, habitsRoutes);
 
 const distDir = path.join(__dirname, '..', 'dist');
 app.use(express.static(distDir));

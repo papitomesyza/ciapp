@@ -76,6 +76,15 @@ export const api = {
     const qs = new URLSearchParams({ scope, ...(date ? { date } : {}) }).toString();
     return request(`/history/range?${qs}`);
   },
+
+  getHabits: () => request('/habits'),
+  getHabitsToday: () => request('/habits/today'),
+  createHabit: (habit) => request('/habits', { method: 'POST', body: JSON.stringify(habit) }),
+  updateHabit: (id, patch) => request(`/habits/${id}`, { method: 'PUT', body: JSON.stringify(patch) }),
+  reorderHabits: (ids) => request('/habits/reorder', { method: 'PUT', body: JSON.stringify({ ids }) }),
+  deleteHabit: (id) => request(`/habits/${id}`, { method: 'DELETE' }),
+  toggleHabit: (id) => request(`/habits/${id}/toggle`, { method: 'POST' }),
+  getHabitDetail: (id) => request(`/habits/${id}/detail`),
 };
 
 export { ApiError };
