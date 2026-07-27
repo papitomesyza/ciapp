@@ -138,7 +138,7 @@ export default function History() {
         </div>
       ) : (
         <>
-          {scope === 'week' && <WeekView range={range} onDateClick={setOpenDate} />}
+          {scope === 'week' && <WeekView range={range} targets={targets} onDateClick={setOpenDate} />}
           {scope === 'month' && <MonthView range={range} targets={targets} onDateClick={setOpenDate} />}
           {scope === 'year' && <YearView range={range} targets={targets} onMonthClick={jumpToMonth} />}
         </>

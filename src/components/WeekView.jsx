@@ -1,7 +1,25 @@
+import { Copy, Check } from 'lucide-react';
+import { useState } from 'react';
 import { formatDateLabel } from '../nutrition.js';
+import { weekLabel, buildWeekCopyText, copyToClipboard } from '../history.js';
 import TrendChart from './TrendChart.jsx';
 
-export default function WeekView({ range, onDateClick }) {
+export default function WeekView({ range, targets, onDateClick }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    const text = buildWeekCopyText({
+      label: weekLabel(range.start, range.end),
+      loggedDays: range.loggedDays,
+      averages: range.averages,
+      targets,
+      days: range.days,
+    });
+    await copyToClipboard(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1600);
+  }
+
   return (
     <div>
       <TrendChart days={range.days} />
@@ -13,6 +31,11 @@ export default function WeekView({ range, onDateClick }) {
           </div>
         ))}
       </div>
+
+      <button className="copy-btn" onClick={handleCopy}>
+        {copied ? <Check size={13} /> : <Copy size={13} />}
+        {copied ? 'Copied' : 'Copy week summary'}
+      </button>
     </div>
   );
 }

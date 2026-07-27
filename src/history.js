@@ -84,6 +84,29 @@ export function buildDayCopyText({ date, totals, entries }) {
   return lines.join('\n');
 }
 
+export function buildWeekCopyText({ label, loggedDays, averages, targets, days }) {
+  const lines = [label, '', `${loggedDays} logged day${loggedDays === 1 ? '' : 's'}`];
+
+  if (loggedDays === 0) {
+    lines.push('No data logged this week.');
+    return lines.join('\n');
+  }
+
+  const cal = calorieStatus(averages.calories, targets.calories_target, loggedDays);
+  const pro = proteinStatus(averages.protein_g, targets.protein_g_target, loggedDays);
+  lines.push(
+    `Calories: avg ${Math.round(averages.calories)} kcal/day vs ${Math.round(targets.calories_target)} target — ${STATUS_LABEL[cal.status]} (${cal.delta >= 0 ? '+' : ''}${cal.delta}/day)`,
+    `Protein: avg ${Math.round(averages.protein_g)} g/day vs ${Math.round(targets.protein_g_target)} g floor — ${STATUS_LABEL[pro.status]} (${pro.delta >= 0 ? '+' : ''}${pro.delta}/day)`,
+    '',
+  );
+
+  for (const d of days.filter((d) => d.entryCount > 0)) {
+    lines.push(`${fullDateLabel(d.date)}: ${Math.round(d.totals.calories)} kcal, ${Math.round(d.totals.protein_g)}g protein`);
+  }
+
+  return lines.join('\n');
+}
+
 export function buildMonthCopyText({ label, loggedDays, averages, targets, days }) {
   const lines = [label, '', `${loggedDays} logged day${loggedDays === 1 ? '' : 's'}`];
 
