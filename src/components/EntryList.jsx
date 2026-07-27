@@ -5,7 +5,7 @@ export const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Di
 
 export default function EntryList({ entries, onEdit, onDelete }) {
   if (!entries.length) {
-    return <div className="empty-state">Nothing logged yet. Tap the + button to add your first entry.</div>;
+    return <div className="empty-state">Nothing logged yet</div>;
   }
 
   const grouped = {};

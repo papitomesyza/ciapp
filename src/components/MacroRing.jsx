@@ -1,9 +1,23 @@
+import { useEffect, useState } from 'react';
+
+// Activity-ring-style mount animation: first paint draws the ring empty,
+// then the arc sweeps to its value on the deceleration curve.
+function useEntered() {
+  const [entered, setEntered] = useState(false);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => requestAnimationFrame(() => setEntered(true)));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return entered;
+}
+
 export default function MacroRing({ label, value, target, unit, color = 'var(--accent)', size = 84 }) {
+  const entered = useEntered();
   const stroke = 9;
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const pct = target > 0 ? Math.min(value / target, 1) : 0;
-  const dash = circumference * pct;
+  const dash = entered ? circumference * pct : 0;
 
   return (
     <div className="ring-tile">
@@ -26,7 +40,7 @@ export default function MacroRing({ label, value, target, unit, color = 'var(--a
           strokeLinecap="round"
           strokeDasharray={`${dash} ${circumference}`}
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: 'stroke-dasharray 0.4s ease' }}
+          style={{ transition: 'stroke-dasharray var(--fill-duration) var(--ease-out)' }}
         />
         <text
           x="50%"

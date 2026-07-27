@@ -57,8 +57,10 @@ export default function Habits() {
     <div className="page">
       <div className="page-header">
         <div>
-          <div className="page-eyebrow">Habits</div>
-          <h1>Today</h1>
+          <div className="page-eyebrow">
+            {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+          </div>
+          <h1>Habits</h1>
         </div>
         <button className="icon-btn" onClick={() => setShowManage(true)} aria-label="Manage habits">
           <SlidersHorizontal size={20} />

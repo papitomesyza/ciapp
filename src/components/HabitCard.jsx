@@ -23,7 +23,7 @@ export default function HabitCard({ habit, onToggle, onOpen }) {
         onClick={(e) => { e.stopPropagation(); onToggle(); }}
         aria-label={habit.completed ? 'Mark not done' : 'Mark done'}
       >
-        {habit.completed && <Check size={18} strokeWidth={3} color="#05130a" />}
+        {habit.completed && <Check size={18} strokeWidth={3} color="var(--on-accent)" />}
       </button>
     </div>
   );

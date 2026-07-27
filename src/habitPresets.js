@@ -47,7 +47,7 @@ export const HABIT_PRESETS = {
   ],
 };
 
-export const HABIT_ACCENT_COLORS = ['#00d341', '#64d2ff', '#ff9f0a', '#ff375f', '#bf5af2', '#ffd60a'];
+export const HABIT_ACCENT_COLORS = ['#30d158', '#64d2ff', '#ff9f0a', '#ff375f', '#bf5af2', '#ffd60a'];
 
 export const HABIT_EMOJI_CHOICES = [
   '✅', '💧', '🏋️', '📖', '😴', '🧘', '🚶', '🍽️', '🧹', '💰',

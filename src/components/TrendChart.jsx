@@ -26,7 +26,7 @@ export default function TrendChart({ days, compactTicks = false }) {
   return (
     <>
       <div className="glass-card">
-        <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 8, fontWeight: 700 }}>CALORIES</div>
+        <div className="chart-title">Calories</div>
         <ResponsiveContainer width="100%" height={130}>
           <BarChart data={data}>
             <CartesianGrid stroke="var(--border)" vertical={false} />
@@ -39,7 +39,7 @@ export default function TrendChart({ days, compactTicks = false }) {
       </div>
 
       <div className="glass-card">
-        <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 8, fontWeight: 700 }}>PROTEIN (G)</div>
+        <div className="chart-title">Protein (g)</div>
         <ResponsiveContainer width="100%" height={130}>
           <BarChart data={data}>
             <CartesianGrid stroke="var(--border)" vertical={false} />
