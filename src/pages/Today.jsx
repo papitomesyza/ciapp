@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Flame, Gauge } from 'lucide-react';
+import { Plus, Flame, Gauge, ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '../api.js';
-import { sumMacros, todayISO } from '../nutrition.js';
+import { sumMacros, todayISO, formatDateLabel } from '../nutrition.js';
 import MacroRing from '../components/MacroRing.jsx';
 import ProgressBar from '../components/ProgressBar.jsx';
 import EntryList from '../components/EntryList.jsx';
@@ -16,15 +16,24 @@ function currentMealGuess() {
   return 'snack';
 }
 
+function shiftDate(dateStr, days) {
+  const d = new Date(`${dateStr}T00:00:00`);
+  d.setDate(d.getDate() + days);
+  const tzOffset = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
+}
+
 export default function Today() {
   const [entries, setEntries] = useState([]);
   const [targets, setTargets] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLog, setShowLog] = useState(false);
   const [editing, setEditing] = useState(null);
-  const date = todayISO();
+  const [date, setDate] = useState(todayISO());
+  const isToday = date === todayISO();
 
   const load = useCallback(async () => {
+    setLoading(true);
     const [entriesData, targetsData] = await Promise.all([api.getEntries({ date }), api.getTargets()]);
     setEntries(entriesData);
     setTargets(targetsData);
@@ -52,29 +61,37 @@ export default function Today() {
     await load();
   }
 
-  if (loading || !targets) {
-    return (
-      <div className="page">
-        <div className="empty-state">
-          <div className="spinner" style={{ margin: '0 auto 10px' }} />
-          Loading…
-        </div>
-      </div>
-    );
-  }
-
   const totals = sumMacros(entries);
 
   return (
     <div className="page">
       <div className="page-header">
         <div>
-          <div className="page-eyebrow">
-            {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
-          </div>
-          <h1>Today</h1>
+          <div className="page-eyebrow">{formatDateLabel(date)}</div>
+          <h1>{isToday ? 'Today' : 'Log entry'}</h1>
+        </div>
+        <div className="range-nav" style={{ alignSelf: 'center' }}>
+          <button aria-label="Previous day" onClick={() => setDate((d) => shiftDate(d, -1))}>
+            <ChevronLeft size={18} />
+          </button>
+          {!isToday && (
+            <button onClick={() => setDate(todayISO())} aria-label="Jump to today">
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '0 4px' }}>Today</span>
+            </button>
+          )}
+          <button aria-label="Next day" disabled={isToday} onClick={() => setDate((d) => shiftDate(d, 1))}>
+            <ChevronRight size={18} />
+          </button>
         </div>
       </div>
+
+      {loading || !targets ? (
+        <div className="empty-state">
+          <div className="spinner" style={{ margin: '0 auto 10px' }} />
+          Loading…
+        </div>
+      ) : (
+        <>
 
       <div className="glass-card">
         <div className="card-header" style={{ color: 'var(--accent)' }}>
@@ -111,6 +128,8 @@ export default function Today() {
       )}
       {editing && (
         <EditEntryModal entry={editing} onClose={() => setEditing(null)} onSave={handleSaveEdit} />
+      )}
+        </>
       )}
     </div>
   );
