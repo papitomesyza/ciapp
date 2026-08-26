@@ -118,18 +118,27 @@ a {
   overflow-y: auto;
 }
 
+/* Full-bleed iridescent hero band: the golden atmospheric media sits behind
+   the display title on every page, with the headline in monochrome white. */
 .page-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 34px;
+  margin: -28px -20px 28px;
+  padding: 68px 20px 34px;
+  color: var(--paper);
+  background:
+    radial-gradient(130% 150% at 12% 8%, rgba(160, 224, 171, 0.9), transparent 52%),
+    radial-gradient(150% 170% at 88% 18%, rgba(255, 172, 46, 0.98), transparent 62%),
+    radial-gradient(160% 180% at 60% 125%, rgba(165, 45, 37, 0.98), transparent 66%),
+    #0a0a0a;
 }
 
 /* Small confident label above the display title. */
 .page-eyebrow {
   font-size: 11px;
   font-weight: 400;
-  color: var(--text-dim);
+  color: rgba(255, 255, 255, 0.8);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   margin-bottom: 12px;
@@ -142,12 +151,13 @@ a {
   line-height: 0.9;
   letter-spacing: -0.02em;
   margin: 0;
+  color: var(--paper);
 }
 
 .page-header .subtitle {
-  color: var(--text-dim);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 16px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 /* Cards are content, not chrome: flat white, hairline border, sharp corners,
@@ -221,7 +231,11 @@ a {
   width: 60px;
   height: 60px;
   border-radius: var(--radius-pill);
-  background: var(--obsidian);
+  background:
+    radial-gradient(120% 120% at 20% 10%, rgb(160, 224, 171), transparent 55%),
+    radial-gradient(130% 130% at 85% 30%, rgb(255, 172, 46), transparent 60%),
+    radial-gradient(140% 140% at 60% 120%, rgb(165, 45, 37), transparent 65%),
+    #0a0a0a;
   color: var(--paper);
   display: flex;
   align-items: center;
