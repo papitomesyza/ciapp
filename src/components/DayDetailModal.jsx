@@ -72,7 +72,7 @@ export default function DayDetailModal({ date, targets, onClose, onChanged }) {
             <>
               <div className="glass-card">
                 <div className="rings-grid">
-                  <MacroRing label="Calories" value={summary.totals.calories} target={targets.calories_target} unit="" color="var(--accent)" />
+                  <MacroRing label="Calories" value={summary.totals.calories} target={targets.calories_target} unit="" color="iridescent" />
                   <MacroRing label="Protein" value={summary.totals.protein_g} target={targets.protein_g_target} unit="g" color="var(--protein)" />
                   <MacroRing label="Carbs" value={summary.totals.carbs_g} target={targets.carbs_g_target} unit="g" color="var(--carbs)" />
                   <MacroRing label="Fat" value={summary.totals.fat_g} target={targets.fat_g_target} unit="g" color="var(--fat)" />

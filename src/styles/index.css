@@ -1,30 +1,58 @@
 :root {
-  /* Apple Health dark-mode surfaces: near-black canvas, solid elevated
-     cards (#1C1C1E / #2C2C2E), hairline separators, HIG label opacities. */
-  --bg: #0c0c0c;
-  --accent: #00d341;
-  --accent-dim: #00d34133;
-  --surface: #1c1c1e;
-  --surface-strong: #2c2c2e;
-  --border: rgba(84, 84, 88, 0.5);
-  --text: #ffffff;
-  --text-dim: rgba(235, 235, 245, 0.6);
-  --text-faint: rgba(235, 235, 245, 0.3);
-  --danger: #ff453a;
-  /* Per-nutrient colors from Apple's dark-mode system palette */
-  --protein: #64d2ff;
-  --carbs: #ff9f0a;
-  --fat: #ff375f;
-  --sugar: #ff9f0a;
-  --sodium: #0a84ff;
-  --satfat: #ff375f;
-  --fiber: #00d341;
-  --radius-lg: 16px;
-  --radius-md: 12px;
-  --radius-sm: 10px;
+  /* monopo saigon — radical monochrome editorial system.
+     Interface palette is strictly black / white / gray; the only chromatic
+     surface anywhere is the iridescent hero gradient, used as media only
+     (the Calories ring and the login backdrop), never as UI fill. */
+
+  /* Monochrome scale */
+  --obsidian: #000000;
+  --paper: #ffffff;
+  --inkstone: #181818;
+  --felt-gray: #6d6d6d;
+  --pewter: #808080;
+  --ash-mist: #9a9a9a;
+  --hairline: rgba(0, 0, 0, 0.14);
+
+  /* Semantic tokens (remapped to monochrome) */
+  --bg: #ffffff;
+  --accent: #000000;
+  --accent-dim: rgba(0, 0, 0, 0.12);
+  --surface: #ffffff;
+  --surface-strong: #ececec;
+  --border: rgba(0, 0, 0, 0.14);
+  --text: #000000;
+  --text-dim: #6d6d6d;
+  --text-faint: #9a9a9a;
+  --danger: #000000;
+
+  /* Per-nutrient tones — a monochrome ramp so rings, bars and charts stay
+     legible without introducing any hue. */
+  --protein: #000000;
+  --carbs: #565656;
+  --fat: #8f8f8f;
+  --sugar: #6d6d6d;
+  --sodium: #000000;
+  --satfat: #9a9a9a;
+  --fiber: #000000;
+
+  /* The lone iridescent gesture: sage green → molten amber → deep oxblood.
+     Media only. */
+  --iridescent: linear-gradient(115deg, rgb(160, 224, 171) 0%, rgb(255, 172, 46) 50%, rgb(165, 45, 37) 100%);
+
+  /* Radii: the system jumps from sharp 0px to full 75px pill, never between.
+     Cards, inputs, images, sheets → 0px. Buttons, tags → pill. */
+  --radius-lg: 0px;
+  --radius-md: 0px;
+  --radius-sm: 0px;
+  --radius-pill: 75px;
+
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  /* Apple San Francisco system font (SF Pro on Apple platforms) */
-  --font-sf: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+
+  /* Roobert is the house face; fall back to Inter / system geometric sans. */
+  --font-sf: 'Roobert', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Patient, gliding motion. */
+  --ease-glide: cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 * {
@@ -42,14 +70,14 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sf);
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overscroll-behavior-y: none;
 }
 
-/* Keep SF on recharts SVG labels/ticks, which otherwise fall back to the
-   browser default sans-serif. (Form controls already inherit it below.) */
+/* Keep the house face on recharts SVG labels/ticks. */
 svg text {
   font-family: var(--font-sf);
 }
@@ -70,6 +98,7 @@ button {
 
 a {
   color: inherit;
+  text-decoration: none;
 }
 
 .app-shell {
@@ -79,65 +108,74 @@ a {
   display: flex;
   flex-direction: column;
   position: relative;
+  border-left: 1px solid var(--hairline);
+  border-right: 1px solid var(--hairline);
 }
 
 .page {
   flex: 1;
-  padding: 20px 16px calc(96px + var(--safe-bottom));
+  padding: 28px 20px calc(104px + var(--safe-bottom));
   overflow-y: auto;
 }
 
 .page-header {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 34px;
 }
 
-/* iOS large-title header with a small-caps date eyebrow above it */
+/* Small confident label above the display title. */
 .page-eyebrow {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 400;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 2px;
+  letter-spacing: 0.14em;
+  margin-bottom: 12px;
 }
 
+/* Whisper-weight editorial display title — speaks at 300, never shouts. */
 .page-header h1 {
-  font-size: 34px;
-  font-weight: 700;
+  font-size: 54px;
+  font-weight: 300;
+  line-height: 0.9;
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 .page-header .subtitle {
   color: var(--text-dim);
-  font-size: 15px;
-  margin-top: 2px;
+  font-size: 16px;
+  margin-top: 6px;
 }
 
+/* Cards are content, not chrome: flat white, hairline border, sharp corners,
+   no shadow. */
 .glass-card {
   background: var(--surface);
+  border: 1px solid var(--hairline);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 24px;
 }
 
 .glass-card + .glass-card {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
-/* Health-style card header: small icon + colored label, chevron-ready */
 .card-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 14px;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text) !important;
+  margin-bottom: 22px;
 }
 
-/* Bottom nav */
+/* Bottom nav — invisible persistence: flat white, single top hairline. */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -148,11 +186,9 @@ a {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 6px 8px calc(8px + var(--safe-bottom));
-  background: rgba(18, 18, 20, 0.82);
-  border-top: 0.5px solid var(--border);
-  backdrop-filter: blur(24px) saturate(1.6);
-  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  padding: 10px 8px calc(12px + var(--safe-bottom));
+  background: var(--paper);
+  border-top: 1px solid var(--hairline);
   z-index: 40;
 }
 
@@ -160,86 +196,89 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
   padding: 6px 14px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   color: var(--text-faint);
   font-size: 10px;
-  font-weight: 500;
-  transition: color 0.15s ease;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.6s var(--ease-glide);
 }
 
 .bottom-nav button.active {
   color: var(--accent);
 }
 
+/* Primary floating action — filled obsidian pill (obsidian is a surface, not
+   a hue), white glyph, flat, no shadow. */
 .fab {
   position: fixed;
-  bottom: calc(76px + var(--safe-bottom));
+  bottom: calc(84px + var(--safe-bottom));
   left: 50%;
   transform: translateX(-50%);
   width: 60px;
   height: 60px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #05130a;
+  border-radius: var(--radius-pill);
+  background: var(--obsidian);
+  color: var(--paper);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px var(--accent-dim), 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.8s var(--ease-glide), opacity 0.4s ease;
   z-index: 41;
 }
 
 .fab:active {
-  transform: translateX(-50%) scale(0.95);
+  transform: translateX(-50%) scale(0.94);
 }
 
 /* Rings */
 .rings-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  gap: 18px;
 }
 
 .ring-tile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .ring-tile .ring-value {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .ring-tile .ring-label {
   font-size: 11px;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 
 /* Secondary bars */
 .bar-row {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 9px 0;
+  gap: 8px;
+  padding: 11px 0;
 }
 
 .bar-row .bar-labels {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text);
 }
 
-/* Health-style value: bold current figure, quiet target suffix */
 .bar-value {
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: 400;
+  font-size: 16px;
 }
 
 .bar-target {
@@ -249,30 +288,30 @@ a {
 }
 
 .bar-track {
-  height: 6px;
-  border-radius: 4px;
+  height: 2px;
+  border-radius: 0;
   background: var(--surface-strong);
   overflow: hidden;
 }
 
 .bar-fill {
   height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  border-radius: 0;
+  transition: width 0.9s var(--ease-glide);
 }
 
 /* Meal groups */
 .meal-group {
-  margin-top: 16px;
+  margin-top: 22px;
 }
 
 .meal-group-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.14em;
   color: var(--text-dim);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
 }
@@ -282,8 +321,8 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline);
 }
 
 .entry-row:last-child {
@@ -296,8 +335,8 @@ a {
 }
 
 .entry-name {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 400;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -309,9 +348,9 @@ a {
 }
 
 .entry-cals {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text);
   white-space: nowrap;
 }
 
@@ -321,13 +360,14 @@ a {
 }
 
 .icon-btn {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: var(--radius-pill);
   color: var(--text-dim);
+  transition: background 0.6s var(--ease-glide), color 0.6s var(--ease-glide);
 }
 
 .icon-btn:active {
@@ -338,34 +378,41 @@ a {
   color: var(--danger);
 }
 
-/* Buttons — iOS filled style: 17pt semibold, continuous 12pt corners */
+/* Buttons — full-pill ghost / obsidian, flat, glide on interaction. */
 .btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 18px;
-  border-radius: var(--radius-md);
-  font-size: 17px;
-  font-weight: 600;
+  padding: 14px 33px;
+  border-radius: var(--radius-pill);
+  font-size: 16px;
+  font-weight: 400;
+  border: 1px solid transparent;
+  transition: background 0.8s var(--ease-glide), color 0.8s var(--ease-glide),
+    border-color 0.8s var(--ease-glide), opacity 0.4s ease;
 }
 
 .btn:active {
-  opacity: 0.75;
+  opacity: 0.7;
 }
 
+/* Filled obsidian pill — the strong primary action. */
 .btn-primary {
-  background: var(--accent);
-  color: #05130a;
+  background: var(--obsidian);
+  color: var(--paper);
+  border-color: var(--obsidian);
 }
 
 .btn-primary:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
+/* Ghost pill — transparent, hairline black border. */
 .btn-ghost {
-  background: var(--surface-strong);
+  background: transparent;
   color: var(--text);
+  border-color: var(--obsidian);
 }
 
 .btn-block {
@@ -376,79 +423,82 @@ a {
   color: var(--danger);
 }
 
-/* Inputs */
+/* Inputs — sharp 0px, hairline underline-forward field, no fill. */
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 8px;
+  margin-bottom: 18px;
 }
 
 .field label {
-  font-size: 13px;
+  font-size: 11px;
   color: var(--text-dim);
-  font-weight: 600;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .field input,
 .field select,
 .field textarea {
-  background: var(--surface-strong);
-  border: 1px solid transparent;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
   border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  font-size: 17px;
+  padding: 13px 14px;
+  font-size: 16px;
   outline: none;
   -webkit-appearance: none;
   appearance: none;
+  transition: border-color 0.6s var(--ease-glide);
 }
 
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
-  border-color: var(--accent);
+  border-color: var(--obsidian);
 }
 
 .field-row {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .field-row .field {
   flex: 1;
 }
 
-/* Segmented / tabs — UISegmentedControl (dark): translucent gray track,
-   elevated gray thumb with a soft shadow, white text on the selection */
+/* Segmented control — pill track, pill thumb, monochrome inversion. */
 .segmented {
   display: flex;
-  background: rgba(118, 118, 128, 0.24);
-  border-radius: 9px;
-  padding: 2px;
-  gap: 2px;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+  gap: 3px;
 }
 
 .segmented button {
   flex: 1;
-  padding: 8px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  transition: background 0.15s ease;
+  padding: 9px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  transition: background 0.6s var(--ease-glide), color 0.6s var(--ease-glide);
 }
 
 .segmented button.active {
-  background: #636366;
-  color: #fff;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 1px 1px rgba(0, 0, 0, 0.15);
+  background: var(--obsidian);
+  color: var(--paper);
 }
 
-/* Sheet / modal */
+/* Sheet / modal — flat white, sharp top corners, hairline framing. */
 .sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 50;
   display: flex;
   align-items: flex-end;
@@ -460,22 +510,22 @@ a {
   max-width: 560px;
   max-height: 90vh;
   background: var(--surface);
-  border-radius: 16px 16px 0 0;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   padding-bottom: var(--safe-bottom);
 }
 
-/* iOS sheet grabber */
 .sheet::before {
   content: '';
   display: block;
-  width: 36px;
-  height: 5px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.22);
-  margin: 8px auto 0;
+  width: 40px;
+  height: 2px;
+  border-radius: 0;
+  background: var(--hairline);
+  margin: 12px auto 0;
   flex-shrink: 0;
 }
 
@@ -483,70 +533,75 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px 8px;
+  padding: 14px 20px 10px;
 }
 
 .sheet-header h2 {
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 400;
   margin: 0;
 }
 
 .sheet-body {
   overflow-y: auto;
-  padding: 0 16px 20px;
+  padding: 0 20px 24px;
   flex: 1;
 }
 
-/* One elevation tier up for surfaces nested inside a sheet */
+/* Nested surfaces inside a sheet: quiet gray inset, sharp. */
 .sheet .glass-card {
-  background: var(--surface-strong);
+  background: #fafafa;
+  border-color: var(--hairline);
 }
 
 .sheet .glass-card .field input,
 .sheet .glass-card .field select,
 .sheet .glass-card .field textarea {
-  background: #3a3a3c;
+  background: var(--paper);
 }
 
-/* Search result rows */
+/* Search result rows — flat, hairline separated, sharp. */
 .result-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  background: var(--surface-strong);
-  margin-bottom: 8px;
+  padding: 14px 4px;
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 0;
+  transition: opacity 0.4s ease;
 }
 
 .result-row:active {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .result-name {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 400;
 }
 
 .result-meta {
   font-size: 12px;
   color: var(--text-dim);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
+/* Tags/badges — full pill, hairline, monochrome. */
 .provider-badge {
   display: inline-block;
-  margin-left: 6px;
-  padding: 1px 6px;
-  border-radius: 5px;
+  margin-left: 8px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
   font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-dim);
-  background: var(--surface-strong);
-  border: 1px solid var(--border);
+  background: transparent;
+  border: 1px solid var(--hairline);
   vertical-align: middle;
 }
 
@@ -554,7 +609,7 @@ a {
 .empty-state {
   text-align: center;
   color: var(--text-dim);
-  padding: 40px 16px;
+  padding: 48px 16px;
   font-size: 14px;
 }
 
@@ -562,9 +617,9 @@ a {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid var(--surface-strong);
-  border-top-color: var(--accent);
-  animation: spin 0.7s linear infinite;
+  border: 1px solid var(--surface-strong);
+  border-top-color: var(--obsidian);
+  animation: spin 0.9s linear infinite;
 }
 
 @keyframes spin {
@@ -573,54 +628,97 @@ a {
   }
 }
 
-/* Login screen */
+/* Login screen — the hero: monochrome wordmark floating over the one
+   iridescent atmospheric field. */
 .login-screen {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  gap: 24px;
+  padding: 32px;
+  gap: 40px;
+  color: var(--paper);
+  background:
+    radial-gradient(120% 80% at 18% 12%, rgba(160, 224, 171, 0.9), transparent 55%),
+    radial-gradient(120% 90% at 82% 38%, rgba(255, 172, 46, 0.88), transparent 60%),
+    radial-gradient(150% 130% at 60% 105%, rgba(165, 45, 37, 0.95), transparent 68%),
+    #050505;
 }
 
 .login-logo {
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 52px;
+  font-weight: 300;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: var(--paper);
 }
 
 .login-logo span {
-  color: var(--accent);
+  color: var(--paper);
+  opacity: 0.7;
+}
+
+/* Ghost pill + translucent fields over the iridescent hero. */
+.login-screen .field label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.login-screen .field input {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: var(--paper);
+}
+
+.login-screen .field input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.login-screen .field input:focus {
+  border-color: var(--paper);
+}
+
+.login-screen .btn-primary {
+  background: transparent;
+  color: var(--paper);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.login-screen .footer-note {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .error-text {
-  color: var(--danger);
+  color: var(--paper);
   font-size: 13px;
+  opacity: 0.85;
 }
 
 .footer-note {
   text-align: center;
   color: var(--text-faint);
   font-size: 11px;
-  padding: 24px 0 8px;
+  letter-spacing: 0.06em;
+  padding: 28px 0 8px;
 }
 
-/* Chart tooltip */
+/* Chart tooltip — flat, hairline, no shadow. */
 .chart-tooltip {
-  background: #2c2c2e;
-  border-radius: 10px;
-  padding: 8px 12px;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  padding: 10px 14px;
   font-size: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .history-day-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline);
+  transition: opacity 0.4s ease;
 }
 
 .history-day-row:last-child {
@@ -628,16 +726,16 @@ a {
 }
 
 .history-day-row:active {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .list-section-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.14em;
   color: var(--text-dim);
-  margin: 20px 0 8px;
+  margin: 28px 0 10px;
 }
 
 .list-section-title:first-child {
@@ -650,7 +748,7 @@ a {
 
 .scanner-frame {
   position: relative;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   overflow: hidden;
   background: #000;
   aspect-ratio: 3/4;
@@ -662,9 +760,9 @@ a {
   object-fit: cover;
 }
 
-/* History — balance carousel (swipe Week / Month / Year) */
+/* History — balance carousel */
 .balance-carousel {
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .balance-track {
@@ -688,22 +786,22 @@ a {
 .balance-dots {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .balance-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 0;
   background: var(--text-faint);
-  transition: background 0.2s ease, width 0.2s ease;
+  transition: background 0.6s var(--ease-glide), width 0.6s var(--ease-glide);
 }
 
 .balance-dot.active {
-  width: 18px;
-  border-radius: 3px;
-  background: var(--accent);
+  width: 20px;
+  border-radius: 0;
+  background: var(--obsidian);
 }
 
 .balance-card {
@@ -714,41 +812,41 @@ a {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .balance-card-title {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 400;
   letter-spacing: -0.01em;
 }
 
 .balance-metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 18px;
 }
 
 .balance-metric-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  font-weight: 600;
-  margin-bottom: 3px;
+  letter-spacing: 0.08em;
+  font-weight: 400;
+  margin-bottom: 5px;
 }
 
 .balance-metric-status {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 300;
   letter-spacing: -0.01em;
-  line-height: 1.15;
+  line-height: 1.1;
 }
 
 .balance-metric-detail {
   font-size: 13px;
   color: var(--text-dim);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .balance-logged-days {
@@ -761,12 +859,13 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 16px 0 10px;
+  margin: 20px 0 12px;
 }
 
 .range-header-label {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 .range-nav {
@@ -776,13 +875,14 @@ a {
 }
 
 .range-nav button {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: var(--radius-pill);
   color: var(--text-dim);
+  transition: background 0.6s var(--ease-glide);
 }
 
 .range-nav button:active {
@@ -796,18 +896,22 @@ a {
 .copy-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 700;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   color: var(--text-dim);
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: var(--surface-strong);
-  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: 1px solid var(--hairline);
+  transition: color 0.6s var(--ease-glide), border-color 0.6s var(--ease-glide);
 }
 
 .copy-btn:active {
   color: var(--accent);
+  border-color: var(--obsidian);
 }
 
 /* History — calendar grid */
@@ -821,8 +925,9 @@ a {
   text-align: center;
   font-size: 10px;
   color: var(--text-faint);
-  font-weight: 700;
-  padding-bottom: 4px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  padding-bottom: 6px;
 }
 
 .calendar-cell {
@@ -831,7 +936,7 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 0;
   font-size: 12px;
   color: var(--text-dim);
   position: relative;
@@ -846,11 +951,11 @@ a {
   opacity: 0.35;
 }
 
-/* Today = filled tint circle behind the day number, like the iOS calendar */
+/* Today marker — filled obsidian circle behind the numeral. */
 .calendar-cell.today span {
-  background: var(--accent);
-  color: #05130a;
-  font-weight: 700;
+  background: var(--obsidian);
+  color: var(--paper);
+  font-weight: 400;
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -863,7 +968,7 @@ a {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--obsidian);
   margin-top: 3px;
 }
 
@@ -873,8 +978,8 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline);
   gap: 10px;
 }
 
@@ -884,12 +989,12 @@ a {
 }
 
 .year-month-row:active {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .year-month-name {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 400;
   flex: 1;
 }
 
@@ -899,7 +1004,7 @@ a {
 
 .year-month-status {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .year-month-meta {
@@ -912,5 +1017,5 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
